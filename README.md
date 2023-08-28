@@ -2,6 +2,11 @@
 
 an app to help you with your nofap journey
 
+## Tech used:
+-  React Native
+-  Typescript
+-  Redux
+
 
 ![image](examples/img2.png)
 ![image](examples/img1.png)
