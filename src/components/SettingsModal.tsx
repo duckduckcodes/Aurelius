@@ -10,18 +10,64 @@ import {
   Platform,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {currentGoalStreak} from '../redux/features/goalSlice';
+import {currentGoalStreak, customGoal} from '../redux/features/goalSlice';
 import Icon from 'react-native-vector-icons/Ionicons';
 import RNDateTimePicker, {
   DateTimePickerAndroid,
 } from '@react-native-community/datetimepicker';
-import {changeStartDate} from '../redux/features/counterSlice';
+import {
+  changeStartDate,
+  currentStartDate,
+} from '../redux/features/counterSlice';
+import {currentModal, toggleSettingModal} from '../redux/features/modalSlice';
+import moment from 'moment';
+import { hideNavigationBar } from 'react-native-navigation-bar-color';
+ 
+function SettingsModal(): JSX.Element {
 
-function SettingsModal({visible}: any): JSX.Element {
+ 
+  
+  const [newDate, setNewDate] = useState(new Date());
+  const [newTime, setNewTime] = useState(new Date());
+
+  const [pickerMode, setPickerMode] = useState('date');
+  const [timeShow, setTimeShow] = useState(false);
+  const [dateShow, setDateShow] = useState(false);
+
+  const [textDate, setTextDate] = useState('Empty');
+  const [textTime, setTextTime] = useState('Empty');
+
+  const visible = useSelector(currentModal);
+
+  const [goalValue, setGoalValue] = useState('');
+
+  const currentStartDateState = useSelector(currentStartDate);
+  const [stateDate, setStateDate] = useState(
+    currentStartDateState || new Date(),
+  );
+
+  useEffect(() => {
+    setStateDate(currentStartDateState);
+  }, [currentStartDateState]);
+
   const currentGoal = useSelector(currentGoalStreak);
   const dispatch = useDispatch();
 
-  const [goalValue, setGoalValue] = useState('');
+  const formatDate = () => {
+    const year = newDate.getFullYear().toString();
+    const month = (newDate.getMonth() + 1).toString().padStart(2, '0');
+    // Months are zero-indexed, so add 1
+    const day = newDate.getDate().toString().padStart(2, '0');
+
+    return day + '/' + month + '/' + year;
+  };
+
+  const formatTime = () => {
+    const hours = newTime.getHours().toString().padStart(2, '0');
+    const minutes = newTime.getMinutes().toString().padStart(2, '0');
+
+    return hours + ':' + minutes;
+  };
 
   const handleTextChange = (inputText: string) => {
     // Filter out non-numeric characters using a regular expression
@@ -41,23 +87,12 @@ function SettingsModal({visible}: any): JSX.Element {
 
     const mergedDate = new Date(year, month - 1, day, hours, minutes, seconds); // Months are zero-indexed
     dispatch(changeStartDate({date: mergedDate}));
-    setShowModal(false);
+
+    let diff = moment(new Date()).diff(moment(mergedDate), 'days');
+     dispatch(customGoal({goalDays: diff}));
+
+    dispatch(toggleSettingModal());
   };
-  const [showModal, setShowModal] = useState(true);
-
-  useEffect(() => {
-    setShowModal(visible);
-  }, [visible]);
-
-  const [newDate, setNewDate] = useState(new Date());
-  const [newTime, setNewTime] = useState(new Date());
-
-  const [pickerMode, setPickerMode] = useState('date');
-  const [timeShow, setTimeShow] = useState(false);
-  const [dateShow, setDateShow] = useState(false);
-
-  const [textDate, setTextDate] = useState('Empty');
-  const [textTime, setTextTime] = useState('Empty');
 
   const showMode = (currentMode: string) => {
     currentMode === 'date' ? setDateShow(true) : setTimeShow(true);
@@ -77,76 +112,66 @@ function SettingsModal({visible}: any): JSX.Element {
   };
 
   return (
-    <Modal transparent visible={true}>
+    <Modal transparent visible={visible.settingOpen}>
       <View style={styles.container}>
-        <View style={{flex: 1, alignItems: 'flex-end'}}>
-          <TouchableOpacity
-            style={{}}
-            onPress={() => {
-              setShowModal(false);
-            }}>
-            <Icon name="close" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-        <View>
+        <View style={styles.modalcontainer}>
+          <View style={{flex: 1, alignItems: 'flex-end'}}>
+            <TouchableOpacity
+              style={{}}
+              onPress={() => {
+                dispatch(toggleSettingModal());
+              }}>
+              <Icon name="close" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
           <View>
-            <Text style={styles.label}>select a custome date</Text>
-            <View style={{flexDirection: 'row', gap: 10}}>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => {
-                  showMode('date');
-                }}>
-                <Text style={styles.label}>date</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{}}
-                onPress={() => {
-                  showMode('time');
-                }}>
-                <Text style={styles.label}>time</Text>
-              </TouchableOpacity>
+            <View>
+              <Text style={styles.label}>select a custome date</Text>
+              <View style={{flexDirection: 'row', gap: 10}}>
+                <TouchableOpacity
+                  style={{}}
+                  onPress={() => {
+                    showMode('date');
+                  }}>
+                  <View style={styles.picker}>
+                    <Text style={styles.label}>{formatDate()}</Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{}}
+                  onPress={() => {
+                    showMode('time');
+                  }}>
+                  <View style={styles.picker}>
+                    <Text style={styles.label}>{formatTime()}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              {dateShow && (
+                <RNDateTimePicker
+                  testID="dateTime"
+                  value={newDate}
+                  mode={pickerMode}
+                  onChange={onDateChange}
+                />
+              )}
+
+              {timeShow && (
+                <RNDateTimePicker
+                  testID="dateTime"
+                  value={newDate}
+                  mode={pickerMode}
+                  onChange={onTimeChange}
+                />
+              )}
             </View>
-
-            {dateShow && (
-              <RNDateTimePicker
-                testID="dateTime"
-                value={newDate}
-                mode={pickerMode}
-                onChange={onDateChange}
-              />
-            )}
-
-            {timeShow && (
-              <RNDateTimePicker
-                testID="dateTime"
-                value={newDate}
-                mode={pickerMode}
-                onChange={onTimeChange}
-              />
-            )}
           </View>
-          <View>
-            <Text style={styles.label}>your streak goal</Text>
-            <TextInput
-              keyboardType="numeric"
-              value={goalValue}
-              onChangeText={handleTextChange}
-              placeholder={currentGoal.goalStreak.toString()}
-              placeholderTextColor={'grey'}
-              style={styles.inputLabel}
-              maxLength={4}
-            />
-
-            <Text style={styles.label}>
-              date: {textDate}, time: {textTime}
-            </Text>
+          <View style={styles.btnContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.relapseText}>Save</Text>
+            </TouchableOpacity>
           </View>
-        </View>
-        <View style={styles.btnContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleSave}>
-            <Text style={styles.relapseText}>Save</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -154,19 +179,26 @@ function SettingsModal({visible}: any): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalcontainer: {
     padding: 8,
     backgroundColor: 'black',
     width: 300,
     borderRadius: 20,
-    height: 300,
+    height: 150,
     borderWidth: 1,
     borderColor: 'white',
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
     backgroundColor: 'transparent',
     position: 'absolute',
-    bottom: 30,
+    bottom: 5,
+    right: 10
   },
   label: {
     color: 'white',
@@ -198,7 +230,15 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-end',
+  },
+
+  picker: {
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 10,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
   },
 });
 

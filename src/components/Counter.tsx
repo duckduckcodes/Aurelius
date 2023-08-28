@@ -3,8 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {currentStartDate} from '../redux/features/counterSlice';
 import moment from 'moment';
 import {useEffect, useState} from 'react';
-import {updateStreak} from '../redux/features/streakSlice';
-
+ 
 interface Diff {
   days: number;
   hours: number;
@@ -25,7 +24,7 @@ function Counter(): JSX.Element {
   });
 
   const calculateDifference = () => {
-    let startDateMoment = moment(startDate.startDate);
+    let startDateMoment = moment(startDate);
     let currentDateMoment = moment(new Date());
     if (currentDateMoment.isAfter(startDateMoment)) {
       let diffInSeconds = currentDateMoment.diff(startDateMoment, 'seconds');
@@ -37,20 +36,21 @@ function Counter(): JSX.Element {
       diffInSeconds = diffInSeconds % 60;
       diffInMinutes = diffInMinutes % 60;
       diffInHours = diffInHours % 24;
-      if (currentDateMoment.diff(startDateMoment, 'days') === 1) {
-        dispatch(updateStreak());
-      }
-
+ 
       setDiff({
         days: diffInDays,
         hours: diffInHours,
         minutes: diffInMinutes,
         seconds: diffInSeconds,
       });
+ 
+
     } else {
       setDiff({days: 0, hours: 0, minutes: 0, seconds: 0});
     }
   };
+
+
 
   useEffect(() => {
     const interval = setInterval(calculateDifference, 1000);
@@ -58,12 +58,23 @@ function Counter(): JSX.Element {
     return () => clearInterval(interval);
   }, [startDate]);
 
+
+ 
+
   return (
     <View>
-      <Text style={styles.textStyle}>{diff?.days} days</Text>
-      <Text style={styles.textStyle}>{diff?.hours} hours</Text>
-      <Text style={styles.textStyle}>{diff?.minutes} minutes</Text>
-      <Text style={styles.textStyle}>{diff?.seconds} seconds</Text>
+      <Text style={styles.textStyle}>
+        {diff?.days} days
+      </Text>
+      <Text style={styles.textStyle}>
+        {diff?.hours.toString().padStart(2, '0')} hours
+      </Text>
+      <Text style={styles.textStyle}>
+        {diff?.minutes.toString().padStart(2, '0')} minutes
+      </Text>
+      <Text style={styles.textStyle}>
+        {diff?.seconds.toString().padStart(2, '0')} seconds
+      </Text>
     </View>
   );
 }

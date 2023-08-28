@@ -5,29 +5,18 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {useColorScheme} from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 import Home from './screens/home';
 import {Provider} from 'react-redux';
 import {store, persistor} from './redux/store';
 import {PersistGate} from 'redux-persist/integration/react';
+import  {
+  hideNavigationBar,
+} from 'react-native-navigation-bar-color';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -36,6 +25,13 @@ type SectionProps = PropsWithChildren<{
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
+  const hide = () => {
+    hideNavigationBar();
+  };
+
+  useEffect(() => {
+    hide();
+  }, []);
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };

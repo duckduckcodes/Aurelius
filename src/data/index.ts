@@ -2,16 +2,17 @@ export interface CounterDate {
   startDate: Date;
  }
 
-export interface CurrentStreak{
-    currentStreak: number
 
+export interface ModalState{
+  settingOpen: boolean
+  confirmationOpen: boolean
 }
 
 export interface GoalSteak{
     goalStreak: number,
 }
 export type RootState = {
-  counter: CounterDate;
+  counter: CounterDate,
   goal: GoalSteak,
-  streak: CurrentStreak
+   modal: ModalState
 };

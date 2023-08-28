@@ -9,8 +9,12 @@ const goalSlice = createSlice({
   name: 'goal',
   initialState,
   reducers: {
-    changeGoalStreak: (state, action: PayloadAction<GoalSteak>) => {
-      state.goalStreak = action.payload.goalStreak;
+    changeGoalStreak: (state, action: PayloadAction<{goal: number}>) => {
+      state.goalStreak = action.payload.goal;
+    },
+
+    customGoal: (state, action: PayloadAction<{goalDays: number}>) => {
+      state.goalStreak = action.payload.goalDays + 7;
     },
     automaticIncrement: state => {
       state.goalStreak += 7;
@@ -18,7 +22,7 @@ const goalSlice = createSlice({
   },
 });
 
-export const {changeGoalStreak, automaticIncrement} = goalSlice.actions;
+export const {changeGoalStreak, automaticIncrement, customGoal} = goalSlice.actions;
 
 export const currentGoalStreak = (state: RootState): GoalSteak => {
   return state.goal;

@@ -1,9 +1,9 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import counterSlice from './features/counterSlice';
 import goalSlice from './features/goalSlice';
-import streakSlice from './features/streakSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { persistReducer, persistStore } from 'redux-persist'; // Import persistStore
+import {persistReducer, persistStore} from 'redux-persist'; // Import persistStore
+import modalSlice from './features/modalSlice';
 
 const persistConfig = {
   key: 'root',
@@ -13,7 +13,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   counter: counterSlice,
   goal: goalSlice,
-  streak: streakSlice,
+  modal: modalSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer); // Use persistedReducer as the root reducer
@@ -21,9 +21,9 @@ const persistedReducer = persistReducer(persistConfig, rootReducer); // Use pers
 const store = configureStore({
   reducer: persistedReducer, // Use persistedReducer as the root reducer
   middleware: getDefaultMiddleware =>
-    getDefaultMiddleware({ serializableCheck: false }),
+    getDefaultMiddleware({serializableCheck: false}),
 });
 
 const persistor = persistStore(store); // Create the persistor
 
-export { store, persistor };
+export {store, persistor};
