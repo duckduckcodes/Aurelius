@@ -7,6 +7,7 @@ an app to help you with your nofap journey
 -  Typescript
 -  Redux
 
+this app is not using Expo
 
 ![image](examples/img2.png)
 ![image](examples/img1.png)
