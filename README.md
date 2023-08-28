@@ -9,9 +9,9 @@ an app to help you with your nofap journey
 
 ## TODO:
 
--  [  ]  fix the ui
--  [  ]  add more features (journal, ect...)
--  [  ]  fix the settings modal
+-  [ ]  fix the ui
+-  [ ]  add more features (journal, ect...)
+-  [ ]  fix the settings modal
 
 
 this app is not using Expo
